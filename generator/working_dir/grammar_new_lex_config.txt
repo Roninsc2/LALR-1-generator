@@ -1,0 +1,6 @@
+"AXIOM_KW" \$AXIOM
+"TERM" "[^"\n\r \t]+"
+"NTERM" [A-Z0-9][A-Z0-9]*
+"EQ" =
+"BREAK" ;
+"OR" \|
