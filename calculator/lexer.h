@@ -7,6 +7,9 @@
 #include <QMap>
 #include "grammarsymbol.h"
 
+extern GrammarSymbol sym_end;
+extern QSet<GrammarSymbol*> terms;
+
 struct Token;
 
 class Lexer {

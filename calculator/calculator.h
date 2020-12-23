@@ -1,12 +1,19 @@
 #pragma once
-#include "node.h"
+
+class Node;
+class CalcNode;
 
 class Calculator
 {
 public:
-    Calculator();
-    void PrintRes(Node *node);
+	Calculator();
+	~Calculator();
+	void PrintRes(Node *node);
 private:
-    int CalcDepth(Node *n, const int d) const;
-    void PrintResLvl(Node *n, int max_depth, int curr_depth);
+	void FreeNode(CalcNode * n);
+	CalcNode *NodeToCalcNode(Node *n);
+	int CalcDepth(Node *n, const int d = 0) const;
+	void PrintResLvl(CalcNode *n, int max_depth, int curr_depth);
+private:
+	CalcNode *root;
 };

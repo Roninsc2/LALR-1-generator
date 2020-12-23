@@ -28,8 +28,8 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
+    calc_node.h \
     calculator.h \
-    grammar_calc.h \
     grammarsymbol.h \
     lex_pars_exeption.h \
     lexer.h \

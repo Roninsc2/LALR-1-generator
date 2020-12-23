@@ -107,7 +107,7 @@ void GrammarLROne::SetupGrammarTable()
 					action[state_id][next_symbol] =
 							QPair<GrammarAction, int>(
 								ACT_REDUCE, prod_id)
-								;
+							;
 				}
 			}
 		}
@@ -346,7 +346,7 @@ void GrammarLROne::Export(const QString &file_name)
 {
 	QMap<GrammarSymbol*, QString> sym_to_int;
 	sym_to_int.insert(gr->GetStartSym(), QString::number(0));
-	sym_to_int.insert(gr->GetEndSym(), QString::number(1));
+	sym_to_int.insert(gr->GetEndSym(), "end");
 	int num = 2;
 	for (int i = 0; i < gr->GetProdsSize(); i++) {
 		if (!sym_to_int.contains(gr->GetNameProdsAt(i))) {
@@ -360,20 +360,23 @@ void GrammarLROne::Export(const QString &file_name)
 			}
 		}
 	}
-	ExportHeader(file_name, sym_to_int);
+
 	QFile file(file_name + ".cpp");
 	if (!file.open(QFile::WriteOnly|QFile::Truncate)){
 		return;
 	}
 	QTextStream stream(&file);
-	stream << "#include \"" << file_name + ".h\"\n\n";
+	stream << "#include \"grammarsymbol.h\"\n"
+	       << "#include <QVector>\n" << "#include <QMap>\n"
+	       << "#include <QSet>\n" << "#include <QPair>\n"
+	       << "#include \"types.h\"\n\n";
 	ExportSyms(stream, sym_to_int);
 	stream << "QVector<QMap<GrammarSymbol*,"
 		  " QPair<GrammarAction, int>>> action = {\n";
 	for (int i = 0; i < action.size(); i++) {
 		stream << "\t{\n";
 		for (auto it = action[i].begin(); it != action[i].end(); it++) {
-			stream << "\t\t{&s" << sym_to_int[it.key()]
+			stream << "\t\t{&sym_" << sym_to_int[it.key()]
 			       << ", QPair<GrammarAction, int>("
 			       << act_to_str[it.value().first] << ", "
 			       << QString::number(it.value().second)
@@ -386,7 +389,7 @@ void GrammarLROne::Export(const QString &file_name)
 	for (int i = 0; i < _goto.size(); i++) {
 		stream << "\t{\n";
 		for (auto it = _goto[i].begin(); it != _goto[i].end(); it++) {
-			stream << "\t\t{&s" << sym_to_int[it.key()]
+			stream << "\t\t{&sym_" << sym_to_int[it.key()]
 			       << ", " << QString::number(it.value())
 			       << "},\n";
 		}
@@ -396,83 +399,6 @@ void GrammarLROne::Export(const QString &file_name)
 	file.close();
 }
 
-/*
-void GrammarLROne::Export(const QString &file_name)
-{
-	QFile file(file_name);
-	QString comma = ",";
-	if (!file.open(QFile::WriteOnly|QFile::Truncate)){
-		return;
-	}
-	QTextStream stream(&file);
-	for (int i = 0; i < gr->GetProdsSize(); i++) {
-		stream << "Rule "
-		       << i << ": "
-		       << gr->GetNameProdsAt(i)->GetSymbol()
-		       << " = ";
-		for (int j = 0; j < gr->GetProdProdsAt(i).size(); j++) {
-			stream << gr->GetProdProdsAt(i).at(j)->GetSymbol() << " ";
-		}
-		stream << "\n";
-	}
-	stream << "\n";
-	stream << QString(" ") << comma;
-	for (auto it = terms.begin(); it != terms.end(); it++) {
-		stream << (*it)->GetSymbol() << comma;
-	}
-	for (auto it = non_terms.begin(); it != non_terms.end(); it++) {
-		stream << (*it)->GetSymbol() << comma;
-	}
-	stream << "\n";
-	/*for (int i = 0; i < action.size(); i++) {
-		stream << i << comma;
-		for (auto it = terms.begin(); it != terms.end(); it++) {
-			if (action[i][*it].first == ACT_SHIFT) {
-				stream << "Shift and goto state " << action[i][*it].second << comma;
-			} else if (action[i][*it].first == ACT_REDUCE) {
-				stream << "Reduce by rule " << action[i][*it].second << comma;
-			} else if (action[i][*it].first == ACT_ACCEPT) {
-				stream << "ACCEPT" << comma;
-			} else {
-				stream << QString() << comma;
-			}
-		}
-
-		for (auto it = non_terms.begin(); it != non_terms.end(); it++) {
-			if (_goto[i][*it] != -1) {
-				stream << "Goto " << _goto[i][*it] << comma;
-			} else {
-				stream << QString() << comma;
-			}
-		}
-		stream << "\n";
-	}
-	for (int i = 0; i < action.size(); i++) {
-			stream << i << comma;
-			for (auto it = terms.begin(); it != terms.end(); it++) {
-				if (action[i][*it].first == ACT_SHIFT) {
-					stream << "s " << action[i][*it].second << comma;
-				} else if (action[i][*it].first == ACT_REDUCE) {
-					stream << "r " << action[i][*it].second << comma;
-				} else if (action[i][*it].first == ACT_ACCEPT) {
-					stream << "a" << comma;
-				} else {
-					stream << QString() << comma;
-				}
-			}
-
-			for (auto it = non_terms.begin(); it != non_terms.end(); it++) {
-				if (_goto[i][*it] != -1) {
-					stream << "g " << _goto[i][*it] << comma;
-				} else {
-					stream << QString() << comma;
-				}
-			}
-			stream << "\n";
-		}
-	file.close();
-}
-*/
 void GrammarLROne::DropItemsetLookaheads(ItemSet set,
 					 QSet<QPair<int, int> > &res)
 {
@@ -509,7 +435,7 @@ void GrammarLROne::ExportHeader(const QString &file_name,
 void GrammarLROne::ExportSyms(QTextStream &stream,
 			      QMap<GrammarSymbol*, QString> &sym_to_int)
 {
-	QString sym = "GrammarSymbol s";
+	QString sym = "GrammarSymbol sym_";
 	for (auto it = sym_to_int.begin(); it != sym_to_int.end(); it++) {
 		stream << sym + it.value();
 		if (it.key()->GetType() == SYMBOL_TERMINAL) {
@@ -533,16 +459,16 @@ void GrammarLROne::ExportSyms(QTextStream &stream,
 	QSet<GrammarSymbol*> terms = gr->GetTerms();
 	stream << "QSet<GrammarSymbol*> terms = {\n\t";
 	for (auto it = terms.begin(); it != terms.end(); it++) {
-		stream << "&s" << sym_to_int[*it] <<", ";
+		stream << "&sym_" << sym_to_int[*it] <<", ";
 	}
 	stream << "\n};\n";
 	stream << "QVector<QPair<GrammarSymbol*, QVector<GrammarSymbol*>>> prods = {\n";
 	for (int i = 0; i < gr->GetProdsSize(); i++) {
 		GrammarSymbol *key = gr->GetNameProdsAt(i);
-		stream << "\tQPair<GrammarSymbol*, QVector<GrammarSymbol*>>(&s"
+		stream << "\tQPair<GrammarSymbol*, QVector<GrammarSymbol*>>(&sym_"
 		       << sym_to_int[key] << ", {\n\t\t";
 		for (int j = 0; j < gr->GetProdProdsAt(i).size(); j++) {
-			stream << "&s" << sym_to_int[gr->GetProdProdsAt(i).at(j)]
+			stream << "&sym_" << sym_to_int[gr->GetProdProdsAt(i).at(j)]
 			       << ", ";
 		}
 		stream << "\n\t}),\n";

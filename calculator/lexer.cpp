@@ -3,7 +3,6 @@
 #include <QFile>
 #include "types.h"
 #include "token.h"
-#include "grammar_calc.h"
 #include <QDebug>
 
 Lexer::Lexer()
@@ -16,7 +15,7 @@ Lexer::Lexer(const QString &codeFile)
 				     SYMBOL_TERMINAL);
 	new_line->SetRegExp("[\n\r]+");
 	space_tab = new GrammarSymbol("SPACE_TAB",
-				     SYMBOL_TERMINAL);
+				      SYMBOL_TERMINAL);
 	space_tab->SetRegExp("[ \t]+");
 
 	regExpStates = QVector<GrammarSymbol*>(terms.begin(), terms.end());
@@ -73,7 +72,7 @@ void Lexer::ParseFile() {
 			throw new LexerExceptionIncorrectChar(line, pos);
 		}
 	}
-	tokens.push_back(Token(&s1, QString(), pos, line));
+	tokens.push_back(Token(&sym_end, QString(), pos, line));
 }
 
 bool Lexer::ParseRegExp() {
@@ -83,7 +82,7 @@ bool Lexer::ParseRegExp() {
 	for (int i = 0; i < regExpStates.size(); i++) {
 		r = regExpStates.at(i);
 		m = r->GetRegExp()->match(code, filePos, QRegularExpression::NormalMatch,
-				   QRegularExpression::AnchoredMatchOption);
+					  QRegularExpression::AnchoredMatchOption);
 		if (m.capturedStart() - filePos == 0) {
 			int p = pos;
 			int l = line;

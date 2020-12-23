@@ -32,7 +32,6 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 HEADERS += \
     grammar.h \
-    grammar_main.h \
     grammarlrone.h \
     grammarlrzero.h \
     grammarsymbol.h \

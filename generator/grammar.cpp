@@ -26,7 +26,7 @@ Grammar::Grammar(const QMap<QString, QVector<QVector<QString>>> &rulesArray,
 	QMap<QString, QString> reg_exp;
 	QFile file(lex_file);
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-	    return;
+		return;
 	}
 	ReadRegExp(file, reg_exp);
 	file.close();
@@ -78,7 +78,7 @@ Grammar::~Grammar()
 		delete *it;
 	}
 
-        delete eps;
+	delete eps;
 	delete end;
 	delete free;
 }
@@ -110,12 +110,12 @@ void Grammar::SetupGrammar()
 void Grammar::ReadRegExp(QFile &file, QMap<QString, QString> &reg_exp)
 {
 	while (!file.atEnd()) {
-	    QString line = QString::fromStdString(file.readLine().toStdString());
-	    line.remove(line.size()-1, 1);
-	    QString type;
-	    QString regExp;
-	    SplitLine(line, type, regExp);
-	    reg_exp[type] = regExp;
+		QString line = QString::fromStdString(file.readLine().toStdString());
+		line.remove(line.size()-1, 1);
+		QString type;
+		QString regExp;
+		SplitLine(line, type, regExp);
+		reg_exp[type] = regExp;
 	}
 }
 

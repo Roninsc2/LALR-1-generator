@@ -6,6 +6,10 @@
 #include <QSet>
 #include <QStack>
 
+extern QVector<QPair<GrammarSymbol*, QVector<GrammarSymbol*>>> prods;
+extern QVector<QMap<GrammarSymbol*, QPair<GrammarAction, int>>> action;
+extern QVector<QMap<GrammarSymbol*, int>> _goto;
+
 class Parser {
 public:
 	Parser();

@@ -34,7 +34,7 @@ Automaton GrammarLRZero::GetAutomaton()
 	next_id++;
 
 	seen = QSet<QSet<QPair<int, int>>>(dfa.states.begin(),
-						dfa.states.end());
+					   dfa.states.end());
 	set_queue = dfa.states;
 	while (set_queue.size()) {
 		new_elems.clear();

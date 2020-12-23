@@ -3,7 +3,6 @@
 #include <iostream>
 #include "node.h"
 #include "token.h"
-#include "grammar_calc.h"
 
 Parser::Parser()
 {
@@ -24,18 +23,18 @@ Node *Parser::GetTree()
 }
 
 Parser::~Parser() {
-    FreeNodes(nodes_stack.top());
+	FreeNodes(nodes_stack.top());
 }
 
 
 void Parser::FreeNodes(Node *n) {
-    if (!n) {
-	return;
-    }
-    for (int i = 0; i < n->GetChildrenSize(); i++) {
-	FreeNodes(n->GetChild(i));
-    }
-    delete n;
+	if (!n) {
+		return;
+	}
+	for (int i = 0; i < n->GetChildrenSize(); i++) {
+		FreeNodes(n->GetChild(i));
+	}
+	delete n;
 }
 
 void Parser::Parse() {
@@ -83,30 +82,30 @@ void Parser::Parse() {
 }
 
 void Parser::Print() {
-    int depth = CalcDepth(nodes_stack.top(), 0);
-    for (int i = 0; i < depth; i++) {
-	std::cout << "level " << i << " = ";
-	PrintLvl(nodes_stack.top(), i, 0);
-	std::cout << std::endl;
-    }
+	int depth = CalcDepth(nodes_stack.top(), 0);
+	for (int i = 0; i < depth; i++) {
+		std::cout << "level " << i << " = ";
+		PrintLvl(nodes_stack.top(), i, 0);
+		std::cout << std::endl;
+	}
 }
 
 void Parser::PrintLvl(Node *n, int max_depth, int curr_depth) {
-    if (curr_depth == max_depth || !n->GetChildrenSize())
-    {
-	std::cout << n->GetType().toStdString() + " ";
-	return;
-    }
-    for (int i = 0; i < n->GetChildrenSize(); i++) {
-	PrintLvl(n->GetChild(i), max_depth, curr_depth + 1);
-    }
+	if (curr_depth == max_depth || !n->GetChildrenSize())
+	{
+		std::cout << n->GetType().toStdString() + " ";
+		return;
+	}
+	for (int i = 0; i < n->GetChildrenSize(); i++) {
+		PrintLvl(n->GetChild(i), max_depth, curr_depth + 1);
+	}
 }
 
 int Parser::CalcDepth(Node *n, const int d) const {
-    int depth = d + 1;
-    for (int i = 0; i < n->GetChildrenSize(); i++) {
-	int tmp = CalcDepth(n->GetChild(i), d + 1);
-	depth = (tmp > depth ? tmp : depth);
-    }
-    return depth;
+	int depth = d + 1;
+	for (int i = 0; i < n->GetChildrenSize(); i++) {
+		int tmp = CalcDepth(n->GetChild(i), d + 1);
+		depth = (tmp > depth ? tmp : depth);
+	}
+	return depth;
 }
